@@ -5,15 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RefreshCw, Database, Clock, CheckCircle2, XCircle, Loader2 } from "lucide-react"
 
-interface DataRecord {
-  _id: string
-  data: Record<string, unknown>
-  fetchedAt: string
-  apiUrl: string
-}
 
 export default function Dashboard() {
-  const [records, setRecords] = useState<DataRecord[]>([])
+  const [records, setRecords] = useState([])
   const [loading, setLoading] = useState(true)
   const [triggering, setTriggering] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -156,7 +150,7 @@ export default function Dashboard() {
             {error ? (
               <div className="flex items-center gap-2 rounded-lg bg-red-500/10 p-4 text-red-600">
                 <XCircle className="h-5 w-5" />
-                <span>Yep {error}</span>
+                <span>{error}</span>
               </div>
             ) : loading ? (
               <div className="flex items-center justify-center py-8">
@@ -171,49 +165,24 @@ export default function Dashboard() {
               <div className="space-y-4">
                 {records.map((record) => (
                   <div
-                    key={record._id}
+                    key={record.GUID}
                     className="rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
                   >
                     <div className="mb-2 flex items-center justify-between">
                       <span className="text-sm font-medium text-muted-foreground">
-                        {new Date(record.fetchedAt).toLocaleString()}
+                        {new Date(record.messageTime).toLocaleString()}
                       </span>
                       <span className="rounded bg-muted px-2 py-1 font-mono text-xs">
-                        {record._id}
+                        {record.GUID}
                       </span>
                     </div>
                     <pre className="overflow-x-auto rounded bg-muted/50 p-3 text-sm">
-                      {JSON.stringify(record.data, null, 2)}
+                      {JSON.stringify(record, null, 2)}
                     </pre>
                   </div>
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Configuration</CardTitle>
-            <CardDescription>
-              Update the API_URL environment variable to fetch from your custom API
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-lg bg-muted p-4">
-              <p className="mb-2 text-sm font-medium">Environment Variables:</p>
-              <ul className="space-y-1 font-mono text-sm">
-                <li>
-                  <span className="text-muted-foreground">MONGODB_URI</span> - Your MongoDB Atlas connection string
-                </li>
-                <li>
-                  <span className="text-muted-foreground">API_URL</span> - The API endpoint to fetch data from
-                </li>
-                <li>
-                  <span className="text-muted-foreground">CRON_SECRET</span> - (Optional) Secret to secure the cron endpoint
-                </li>
-              </ul>
-            </div>
           </CardContent>
         </Card>
       </div>

@@ -12,7 +12,6 @@ export async function GET() {
     // Get the latest 50 records, sorted by most recent first
     const records = await collection
       .find({})
-      .sort({ fetchedAt: -1 })
       .limit(50)
       .toArray()
 
