@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import clientPromise from "@/lib/mongodb"
+import clientPromise, { databaseName, collections } from "@/lib/mongodb"
 import { stringify } from "querystring"
 
 // Configure the cron job to run every hour
@@ -34,35 +34,32 @@ export async function GET(request: Request) {
 
     const data = await response.json()
 
-    return NextResponse.json({
-      success: true,
-      message: "Data fetched successfully",
-      response: data,
-      timestamp: new Date().toISOString(),
-    })
+    // Define the collections to store different types of data
 
     // Connect to MongoDB and store the data
     const client = await clientPromise
-    const db = client.db("api_data")
-    const collection = db.collection("fetched_data")
+    const db = client.db(databaseName)
 
-    // Insert the fetched data with a timestamp
-    const result = await collection.insertOne({
-      data,
-      fetchedAt: new Date(),
-      apiUrl: API_URL,
-    })
+    // Upsert records into the respective collections based on GUID
+    for (const collectionName of collections) {
+      const collection = db.collection(collectionName)
+      for (const record of data[collectionName]) {
+        await collection.updateOne(
+          {"GUID": record.GUID},
+          { $set: { data } },
+          { upsert: true }
+        )
+      }
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Data fetched and stored successfully",
-      insertedId: result.insertedId,
-      timestamp: new Date().toISOString(),
+      message: "Data fetched and stored successfully"
     })
   }
 
   catch (error) {
-    console.error("Error in cron job:", error)
+    console.error("Error in data fetch job:", error)
     return NextResponse.json(
       {
         success: false,

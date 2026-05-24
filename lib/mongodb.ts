@@ -9,6 +9,8 @@ const options = {}
 
 let client: MongoClient
 let clientPromise: Promise<MongoClient>
+let databaseName = "ppThreatsDb"
+let collections = ["messagesDelivered", "messagesBlocked", "clicksBlocked", "clicksPermitted"]
 
 if (process.env.NODE_ENV === "development") {
   // In development mode, use a global variable so that the value
@@ -29,3 +31,4 @@ if (process.env.NODE_ENV === "development") {
 }
 
 export default clientPromise
+export { databaseName, collections }

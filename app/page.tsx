@@ -41,11 +41,11 @@ export default function Dashboard() {
     }
   }
 
-  const triggerFetch = async () => {
+  const triggerUpdate = async () => {
     try {
       setTriggering(true)
       setLastTriggerResult(null)
-      const response = await fetch("/api/cron/fetch-data")
+      const response = await fetch("/api/data/update")
       const result = await response.json()
 
       setLastTriggerResult({
@@ -96,7 +96,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-wrap gap-4">
-              <Button onClick={triggerFetch} disabled={triggering}>
+              <Button onClick={triggerUpdate} disabled={triggering}>
                 {triggering ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

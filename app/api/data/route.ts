@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
-import clientPromise from "@/lib/mongodb"
+import clientPromise, { databaseName, collections } from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
   try {
     const client = await clientPromise
-    const db = client.db("api_data")
-    const collection = db.collection("fetched_data")
+    const db = client.db(databaseName)
+    const collection = db.collection("messagesDelivered")
 
     // Get the latest 50 records, sorted by most recent first
     const records = await collection
