@@ -48,7 +48,7 @@ export async function GET(request: Request) {
         for (const record of data[collectionName]) {
           const ur = await collection.updateOne(
             {"GUID": record.GUID},
-            { $set: { record } },
+            { $set: record },
             { upsert: true }
           )
           responseCount+=ur.upsertedCount
