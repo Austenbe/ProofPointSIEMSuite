@@ -15,10 +15,15 @@ export async function GET() {
       .limit(50)
       .toArray()
 
+    const metadataCollection = db.collection("metadata")
+    const metadata = await metadataCollection.findOne({ _id: "syncStatus" })
+    const lastUpdated = metadata?.lastUpdated || null
+
     return NextResponse.json({
       success: true,
       count: records.length,
       records,
+      lastUpdated,
     })
   } catch (error) {
     console.error("Error fetching data:", error)

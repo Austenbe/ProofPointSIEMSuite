@@ -7,10 +7,11 @@ import { RefreshCw, Database, Clock, CheckCircle2, XCircle, Loader2 } from "luci
 
 
 export default function Dashboard() {
-  const [records, setRecords] = useState([])
+  const [records, setRecords] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [triggering, setTriggering] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null)
   const [lastTriggerResult, setLastTriggerResult] = useState<{
     success: boolean
     message: string
@@ -25,6 +26,7 @@ export default function Dashboard() {
 
       if (result.success) {
         setRecords(result.records)
+        setLastUpdated(result.lastUpdated || null)
       } else {
         setError(result.error)
       }
@@ -85,7 +87,9 @@ export default function Dashboard() {
               Cron Job Status
             </CardTitle>
             <CardDescription>
-              The cron job runs every hour at minute 0 (e.g., 1:00, 2:00, 3:00...)
+              {lastUpdated
+                ? `Last Updated: ${new Date(lastUpdated).toLocaleString()}`
+                : loading ? "Loading last update time..." : "Last Updated: Never"}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -99,7 +103,7 @@ export default function Dashboard() {
                 ) : (
                   <>
                     <RefreshCw className="mr-2 h-4 w-4" />
-                    Trigger Manual Fetch
+                    Update Data
                   </>
                 )}
               </Button>
@@ -112,7 +116,7 @@ export default function Dashboard() {
                 ) : (
                   <>
                     <Database className="mr-2 h-4 w-4" />
-                    Refresh Records
+                    Load Data
                   </>
                 )}
               </Button>

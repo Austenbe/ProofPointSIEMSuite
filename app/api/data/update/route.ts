@@ -33,6 +33,7 @@ export async function GET(request: Request) {
     }
 
     const data = await response.json()
+    let responseCount = 0
 
     // Define the collections to store different types of data
 
@@ -43,18 +44,29 @@ export async function GET(request: Request) {
     // Upsert records into the respective collections based on GUID
     for (const collectionName of collections) {
       const collection = db.collection(collectionName)
-      for (const record of data[collectionName]) {
-        await collection.updateOne(
-          {"GUID": record.GUID},
-          { $set: { data } },
-          { upsert: true }
-        )
+      if (data[collectionName]) {
+        for (const record of data[collectionName]) {
+          const ur = await collection.updateOne(
+            {"GUID": record.GUID},
+            { $set: { data } },
+            { upsert: true }
+          )
+          responseCount+=ur.upsertedCount
+        }
       }
     }
 
+    // Update the last successful fetch timestamp
+    const metadataCollection = db.collection("metadata")
+    await metadataCollection.updateOne(
+      { _id: "syncStatus" },
+      { $set: { lastUpdated: new Date() } },
+      { upsert: true }
+    )
+
     return NextResponse.json({
       success: true,
-      message: "Data fetched and stored successfully"
+      message: `Data Updated. ${responseCount} events added`
     })
   }
 
