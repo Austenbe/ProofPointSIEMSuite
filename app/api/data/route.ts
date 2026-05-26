@@ -3,11 +3,17 @@ import clientPromise, { databaseName, collections } from "@/lib/mongodb"
 
 export const dynamic = "force-dynamic"
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url)
+    const collectionParam = searchParams.get("collection")
+    const targetCollection = collectionParam && collections.includes(collectionParam) 
+      ? collectionParam 
+      : "messagesDelivered"
+
     const client = await clientPromise
     const db = client.db(databaseName)
-    const collection = db.collection("messagesDelivered")
+    const collection = db.collection(targetCollection)
 
     // Get the latest 50 records, sorted by most recent first
     const records = await collection

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RefreshCw, Database, Clock, CheckCircle2, XCircle, Loader2 } from "lucide-react"
 
 
@@ -12,16 +13,17 @@ export default function Dashboard() {
   const [triggering, setTriggering] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState("messagesDelivered")
   const [lastTriggerResult, setLastTriggerResult] = useState<{
     success: boolean
     message: string
   } | null>(null)
 
-  const fetchRecords = async () => {
+  const fetchRecords = async (collection = activeTab) => {
     try {
       setLoading(true)
       setError(null)
-      const response = await fetch("/api/data")
+      const response = await fetch(`/api/data?collection=${collection}`)
       const result = await response.json()
 
       if (result.success) {
@@ -65,26 +67,23 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    fetchRecords()
-  }, [])
+    fetchRecords(activeTab)
+  }, [activeTab])
 
   return (
     <main className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-4xl space-y-8">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
-            API Data Collector
+            ProofPoint SIEM Suite
           </h1>
-          <p className="text-muted-foreground">
-            Automatically fetches data from your API every hour and stores it in MongoDB Atlas.
-          </p>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              Cron Job Status
+              ProofPoint Sync Status
             </CardTitle>
             <CardDescription>
               {lastUpdated
@@ -147,46 +146,59 @@ export default function Dashboard() {
               Stored Records
             </CardTitle>
             <CardDescription>
-              Showing the latest {records.length} records from MongoDB
+              Showing the latest {records.length} records from {activeTab}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {error ? (
-              <div className="flex items-center gap-2 rounded-lg bg-red-500/10 p-4 text-red-600">
-                <XCircle className="h-5 w-5" />
-                <span>{error}</span>
-              </div>
-            ) : loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              </div>
-            ) : records.length === 0 ? (
-              <div className="py-8 text-center text-muted-foreground">
-                <Database className="mx-auto mb-4 h-12 w-12 opacity-50" />
-                <p>No records yet. Click &quot;Trigger Manual Fetch&quot; to fetch data.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {records.map((record) => (
-                  <div
-                    key={record.GUID}
-                    className="rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
-                  >
-                    <div className="mb-2 flex items-center justify-between">
-                      <span className="text-sm font-medium text-muted-foreground">
-                        {new Date(record.messageTime).toLocaleString()}
-                      </span>
-                      <span className="rounded bg-muted px-2 py-1 font-mono text-xs">
-                        {record.GUID}
-                      </span>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-4 mb-4">
+                <TabsTrigger value="messagesDelivered">Messages Delivered</TabsTrigger>
+                <TabsTrigger value="messagesBlocked">Messages Blocked</TabsTrigger>
+                <TabsTrigger value="clicksBlocked">Clicks Blocked</TabsTrigger>
+                <TabsTrigger value="clicksPermitted">Clicks Permitted</TabsTrigger>
+              </TabsList>
+              
+              {["messagesDelivered", "messagesBlocked", "clicksBlocked", "clicksPermitted"].map((tab) => (
+                <TabsContent key={tab} value={tab}>
+                  {error ? (
+                    <div className="flex items-center gap-2 rounded-lg bg-red-500/10 p-4 text-red-600">
+                      <XCircle className="h-5 w-5" />
+                      <span>{error}</span>
                     </div>
-                    <pre className="overflow-x-auto rounded bg-muted/50 p-3 text-sm">
-                      {JSON.stringify(record, null, 2)}
-                    </pre>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ) : loading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : records.length === 0 ? (
+                    <div className="py-8 text-center text-muted-foreground">
+                      <Database className="mx-auto mb-4 h-12 w-12 opacity-50" />
+                      <p>No records yet. Click &quot;Update Data&quot; to fetch data.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {records.map((record) => (
+                        <div
+                          key={record.GUID}
+                          className="rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
+                        >
+                          <div className="mb-2 flex items-center justify-between">
+                            <span className="text-sm font-medium text-muted-foreground">
+                              {new Date(record.messageTime || record.timeLogged).toLocaleString()}
+                            </span>
+                            <span className="rounded bg-muted px-2 py-1 font-mono text-xs">
+                              {record.GUID}
+                            </span>
+                          </div>
+                          <pre className="overflow-x-auto rounded bg-muted/50 p-3 text-sm">
+                            {JSON.stringify(record, null, 2)}
+                          </pre>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              ))}
+            </Tabs>
           </CardContent>
         </Card>
       </div>
