@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Database, LineChart } from "lucide-react"
+import { Database, LineChart, Bot } from "lucide-react"
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -17,6 +17,11 @@ export function Sidebar() {
       href: "/analytics",
       label: "Analytics",
       icon: LineChart,
+    },
+    {
+      href: "/ask-ai",
+      label: "Ask AI",
+      icon: Bot,
     },
   ]
 
