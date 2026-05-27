@@ -142,8 +142,8 @@ export default function AnalyticsPage() {
                     tickMargin={10} 
                     interval={0}
                     height={60}
-                    tick={{ angle: -45, textAnchor: 'end', fontSize: 11 }}
-                    tickFormatter={(value) => value && value.length > 12 ? value.substring(0, 12) + '...' : value}
+                    tick={{ textAnchor: 'middle', fontSize: 11 }}
+                    tickFormatter={(value) => value && value.length > 13 + Math.abs(data.length - 10) * 2 ? value.substring(0, 13 + Math.abs(data.length - 10) * 2) + '...' : value}
                   />
                   <YAxis 
                     tickLine={false} 
