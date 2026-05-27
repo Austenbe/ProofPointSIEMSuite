@@ -87,7 +87,7 @@ export default function Dashboard() {
             </CardTitle>
             <CardDescription>
               {lastUpdated
-                ? `Last Updated: ${new Date(lastUpdated).toLocaleString()}`
+                ? `Last Updated: ${new Date(lastUpdated).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}`
                 : loading ? "Loading last update time..." : "Last Updated: Never"}
             </CardDescription>
           </CardHeader>
