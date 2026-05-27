@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RefreshCw, Database, Clock, CheckCircle2, XCircle, Loader2 } from "lucide-react"
 import { ProofpointMessageEvent } from "@/types"
+import { MessageEventCard } from "@/components/MessageEventCard"
 
 
 export default function Dashboard() {
@@ -108,7 +109,7 @@ export default function Dashboard() {
                   </>
                 )}
               </Button>
-              <Button variant="outline" onClick={fetchRecords} disabled={loading}>
+              <Button variant="outline" onClick={() => fetchRecords()} disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -178,23 +179,8 @@ export default function Dashboard() {
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {records.map((record) => (
-                        <div
-                          key={record.GUID}
-                          className="rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
-                        >
-                          <div className="mb-2 flex items-center justify-between">
-                            <span className="text-sm font-medium text-muted-foreground">
-                              {new Date(record.messageTime).toLocaleString()}
-                            </span>
-                            <span className="rounded bg-muted px-2 py-1 font-mono text-xs">
-                              {record.GUID}
-                            </span>
-                          </div>
-                          <pre className="overflow-x-auto rounded bg-muted/50 p-3 text-sm">
-                            {JSON.stringify(record, null, 2)}
-                          </pre>
-                        </div>
+                      {records.map((record, index) => (
+                        <MessageEventCard key={record.GUID || index} event={record} />
                       ))}
                     </div>
                   )}

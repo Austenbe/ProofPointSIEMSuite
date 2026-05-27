@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-import { Loader2, ShieldAlert, AlertCircle, MousePointer2, ExternalLink } from "lucide-react"
+import { Loader2, ShieldAlert, AlertCircle, MousePointer2, ExternalLink, CheckCircle2 } from "lucide-react"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { MessageEventCard } from "@/components/MessageEventCard"
 
 const chartConfig = {
   threatCount: {
@@ -166,57 +167,9 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Recent Events Section */}
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Delivered Threats Card */}
-          <Card className="flex flex-col h-[500px]">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
-                <AlertCircle className="h-5 w-5" />
-                Recent Escapes (Delivered)
-              </CardTitle>
-              <CardDescription>
-                Malicious messages that bypassed the filter and were delivered
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 overflow-hidden">
-              <ScrollArea className="h-full pr-4">
-                {loading ? (
-                  <div className="flex h-40 items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                  </div>
-                ) : recentDelivered.length === 0 ? (
-                  <div className="flex h-40 items-center justify-center text-sm text-muted-foreground text-center">
-                    No malicious messages delivered in this timeframe. Excellent!
-                  </div>
-                ) : (
-                  <div className="space-y-3 pb-6">
-                    {recentDelivered.map((item, i) => (
-                      <div key={i} className="flex flex-col space-y-2 rounded-lg border bg-card p-3 shadow-sm transition-colors hover:bg-muted/50">
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-sm truncate mr-2" title={item.customerName}>
-                            {item.customerName}
-                          </span>
-                          <Badge variant="outline" className="text-xs shrink-0 bg-red-50 text-red-700 border-red-200 dark:bg-red-950/50 dark:text-red-400 dark:border-red-900">
-                            Delivered
-                          </Badge>
-                        </div>
-                        <div className="text-xs text-muted-foreground flex justify-between gap-4">
-                          <span className="truncate" title={item.sender}>{item.sender || "Unknown Sender"}</span>
-                          <span className="shrink-0">{new Date(item.messageTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                        </div>
-                        <div className="text-sm font-medium truncate" title={item.subject}>
-                          {item.subject || "(No Subject)"}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
-            </CardContent>
-          </Card>
-
+        <div className="grid gap-4 grid-cols-1">
           {/* Permitted Clicks Card */}
-          <Card className="flex flex-col h-[500px]">
+          <Card className={`flex flex-col ${(!loading && recentClicks.length === 0) ? '' : 'h-[500px]'}`}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
                 <MousePointer2 className="h-5 w-5" />
@@ -233,8 +186,9 @@ export default function AnalyticsPage() {
                     <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                   </div>
                 ) : recentClicks.length === 0 ? (
-                  <div className="flex h-40 items-center justify-center text-sm text-muted-foreground text-center">
-                    No permitted malicious clicks in this timeframe.
+                  <div className="flex flex-col h-32 items-center justify-center text-sm text-muted-foreground text-center space-y-3">
+                    <CheckCircle2 className="h-8 w-8 text-green-500/70" />
+                    <p>No permitted malicious clicks in this timeframe.</p>
                   </div>
                 ) : (
                   <div className="space-y-3 pb-6">
@@ -261,6 +215,39 @@ export default function AnalyticsPage() {
                           </div>
                         )}
                       </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </CardContent>
+          </Card>
+
+          {/* Delivered Threats Card */}
+          <Card className={`flex flex-col ${(!loading && recentDelivered.length === 0) ? '' : 'h-[500px]'}`}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                <AlertCircle className="h-5 w-5" />
+                Recent Escapes (Delivered)
+              </CardTitle>
+              <CardDescription>
+                Malicious messages that bypassed the filter and were delivered
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex-1 overflow-hidden">
+              <ScrollArea className="h-full pr-4">
+                {loading ? (
+                  <div className="flex h-40 items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : recentDelivered.length === 0 ? (
+                  <div className="flex flex-col h-32 items-center justify-center text-sm text-muted-foreground text-center space-y-3">
+                    <CheckCircle2 className="h-8 w-8 text-green-500/70" />
+                    <p>No malicious messages delivered in this timeframe. Excellent!</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 pb-6">
+                    {recentDelivered.map((item, i) => (
+                      <MessageEventCard key={item.GUID || i} event={item} />
                     ))}
                   </div>
                 )}
