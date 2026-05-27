@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RefreshCw, Database, Clock, CheckCircle2, XCircle, Loader2 } from "lucide-react"
+import { ProofpointMessageEvent } from "@/types"
 
 
 export default function Dashboard() {
-  const [records, setRecords] = useState<any[]>([])
+  console.log(process.env.ProofPoint_PASSWORD)
+  const [records, setRecords] = useState<ProofpointMessageEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [triggering, setTriggering] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -183,7 +185,7 @@ export default function Dashboard() {
                         >
                           <div className="mb-2 flex items-center justify-between">
                             <span className="text-sm font-medium text-muted-foreground">
-                              {new Date(record.messageTime || record.timeLogged).toLocaleString()}
+                              {new Date(record.messageTime).toLocaleString()}
                             </span>
                             <span className="rounded bg-muted px-2 py-1 font-mono text-xs">
                               {record.GUID}

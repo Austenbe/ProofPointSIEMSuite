@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import clientPromise, { databaseName } from "@/lib/mongodb"
+import { ProofpointMessageEvent } from "@/types"
+
 
 export const dynamic = "force-dynamic"
 
@@ -17,7 +19,7 @@ export async function GET(request: Request) {
 
     const client = await clientPromise
     const db = client.db(databaseName)
-    const collection = db.collection(collectionName)
+    const collection = db.collection<ProofpointMessageEvent>(collectionName)
 
     // Build the match stage for the date range
     const matchStage: any = {}

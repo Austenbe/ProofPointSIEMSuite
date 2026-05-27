@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import clientPromise, { databaseName, collections } from "@/lib/mongodb"
+import { ProofpointMessageEvent } from '@/types';
 
 export const dynamic = "force-dynamic"
 
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
 
     const client = await clientPromise
     const db = client.db(databaseName)
-    const collection = db.collection(targetCollection)
+    const collection = db.collection<ProofpointMessageEvent>(targetCollection)
 
     // Get the latest 50 records, sorted by most recent first
     const records = await collection
