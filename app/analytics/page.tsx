@@ -171,7 +171,7 @@ export default function AnalyticsPage() {
           {/* Permitted Clicks Card */}
           <Card className={`flex flex-col ${(!loading && recentClicks.length === 0) ? '' : 'h-[500px]'}`}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+              <CardTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
                 <MousePointer2 className="h-5 w-5" />
                 Permitted Clicks
               </CardTitle>
